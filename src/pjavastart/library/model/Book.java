@@ -1,7 +1,5 @@
 package pjavastart.library.model;
 
-import java.io.StringReader;
-
 public class Book {
     private String title;
     private String author;
