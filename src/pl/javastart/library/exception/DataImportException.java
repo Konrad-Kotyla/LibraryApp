@@ -1,7 +1,7 @@
 package pl.javastart.library.exception;
 
-public class DataExportException extends RuntimeException {
-    public DataExportException(String message) {
+public class DataImportException extends RuntimeException {
+    public DataImportException(String message) {
         super(message);
     }
 }

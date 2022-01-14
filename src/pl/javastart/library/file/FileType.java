@@ -1,2 +1,5 @@
-package pl.javastart.library.file;public enum FileType {
+package pl.javastart.library.file;
+
+public enum FileType {
+    SERIAL
 }
