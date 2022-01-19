@@ -7,15 +7,7 @@ public class Library implements Serializable {
 	Publication[] publications = new Publication[MAX_PUBLICATIONS];
 	private int publicationsNumber;
 
-	public void addBook(Book book) {
-		addPublication(book);
-	}
-
-	public void addMagazine(Magazine magazine) {
-		addPublication(magazine);
-	}
-
-	private void addPublication(Publication publication) {
+	public void addPublication(Publication publication) {
 		if (publicationsNumber < MAX_PUBLICATIONS) {
 			publications[publicationsNumber++] = publication;
 		} else {
