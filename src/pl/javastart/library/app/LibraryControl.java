@@ -14,6 +14,7 @@ import pl.javastart.library.model.Magazine;
 import pl.javastart.library.model.Publication;
 
 import java.util.InputMismatchException;
+import java.util.NoSuchElementException;
 
 class LibraryControl {
     private ConsolePrinter printer = new ConsolePrinter();
@@ -56,8 +57,45 @@ class LibraryControl {
                 case PRINT_MAGAZINES:
                     printMagazines();
                     break;
+                case DELETE_BOOK:
+                    deleteBook();
+                    break;
+                case DELETE_MAGAZINE:
+                    deleteMagazine();
+                    break;
             }
         } while (option != Option.EXIT);
+    }
+
+    private void deleteMagazine() {
+        printer.printLine("Podaj tytuł magazynu:");
+        String title = dataReader.readText();
+        printer.printLine("Podaj dzień wydania magazynu:");
+        int day = dataReader.readNumber();
+        printer.printLine("Podaj miesiąc wydania magazynu:");
+        int month = dataReader.readNumber();
+        printer.printLine("Podaj rok wydania magazynu:");
+        int year = dataReader.readNumber();
+        try {
+            Magazine magazine = library.findMagazineByTitleAndPublicationDate(title, day, month, year);
+            library.removePublication(magazine);
+            printer.printLine("Usunięto magazyn.");
+        } catch (NoSuchElementException e) {
+            printer.printLine(e.getMessage());
+        }
+    }
+
+    private void deleteBook() {
+        printer.printLine("Podaj numer ISBN:");
+        String isbn = dataReader.readText();
+
+        try {
+            Book book = library.findBookByIsbn(isbn);
+            library.removePublication(book);
+            printer.printLine("Usunięto książkę.");
+        } catch (NoSuchElementException e) {
+            printer.printLine(e.getMessage());
+        }
     }
 
     private void printOptions() {
@@ -71,7 +109,7 @@ class LibraryControl {
         try {
             fileManager.exportData(library);
             printer.printLine("Export danych do pliku zakończony powoedzniem.");
-        } catch (DataExportException e){
+        } catch (DataExportException e) {
             printer.printLine(e.getMessage());
         }
         printer.printLine("Do widzenia!");
@@ -132,7 +170,9 @@ class LibraryControl {
         ADD_BOOK(1, "Dodaj książkę"),
         ADD_MAGAZINES(2, "Dodaj magazyn"),
         PRINT_BOOKS(3, "Wyświetl dostępne książki"),
-        PRINT_MAGAZINES(4, "Wyświetl dostępne magazyny");
+        PRINT_MAGAZINES(4, "Wyświetl dostępne magazyny"),
+        DELETE_BOOK(5, "Usuń książkę"),
+        DELETE_MAGAZINE(6, "Usuń magazyn");
 
         private final int value;
         private final String description;

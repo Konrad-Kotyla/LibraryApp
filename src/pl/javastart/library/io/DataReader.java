@@ -62,4 +62,14 @@ public class DataReader {
 
         return new Magazine(title, publisher, language, year, month, day);
     }
+
+    public String readText() {
+        return sc.nextLine();
+    }
+
+    public int readNumber() {
+        int number = sc.nextInt();
+        sc.nextLine();
+        return number;
+    }
 }
