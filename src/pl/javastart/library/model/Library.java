@@ -1,51 +1,47 @@
 package pl.javastart.library.model;
 
+import pl.javastart.library.exception.PublicationAlreadyExistsException;
+import pl.javastart.library.exception.UserAlreadyExistsException;
+
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class Library implements Serializable {
-    private static final int INITIAL_CAPACITY = 1;
-    private int publicationsNumber;
-    Publication[] publications = new Publication[INITIAL_CAPACITY];
+    private Map<String, Publication> publications = new HashMap<>();
+    private Map<String, LibraryUser> users = new HashMap<>();
 
-    public Publication[] getPublications() {
-        Publication[] result = new Publication[publicationsNumber];
-        for (int i = 0; i < publicationsNumber; i++) {
-            result[i] = publications[i];
-        }
-        return result;
+    public Map<String, Publication> getPublications() {
+        return publications;
+    }
+
+    public Map<String, LibraryUser> getUsers() {
+        return users;
+    }
+
+    public void addUser(LibraryUser user) {
+        if (users.containsKey(user.getPesel()))
+            throw new UserAlreadyExistsException(
+                    "Użytkownik ze wskazanym peselem już istnieje " + user.getPesel()
+            );
+        users.put(user.getPesel(), user);
     }
 
     public void addPublication(Publication publication) {
-        if (publicationsNumber == publications.length) {
-            publications = Arrays.copyOf(publications, publications.length * 2);
-        }
-        publications[publicationsNumber] = publication;
-        publicationsNumber++;
+        if (publications.containsKey(publication.getTitle()))
+            throw new PublicationAlreadyExistsException(
+                    "Publikacja o takim tytule już istnieje: " + publication.getTitle()
+            );
+        publications.put(publication.getTitle(), publication);
     }
 
     public boolean removePublication(Publication publication) {
-        final int NOT_FOUND = -1;
-        int found = NOT_FOUND;
-        int counter = 0;
-
-        while (counter < publicationsNumber && found == NOT_FOUND) {
-            if (publication.equals(publications[counter])) {
-                found = counter;
-            } else {
-                counter++;
-            }
-        }
-        if (found != NOT_FOUND) {
-            System.arraycopy(publications, found + 1, publications, found, publications.length - found - 1);
-            publicationsNumber--;
-        }
-        return found != NOT_FOUND;
+        return publications.remove(publication.getTitle(), publication);
     }
 
     public Book findBookByIsbn(String isbn) {
-        for (Publication publication : publications) {
+        for (Publication publication : publications.values()) {
             if (publication.getClass() == Book.class) {
                 Book book = (Book) publication;
                 if (book.getIsbn().equals(isbn)) {
@@ -57,7 +53,7 @@ public class Library implements Serializable {
     }
 
     public Magazine findMagazineByTitleAndPublicationDate(String title, int day, int month, int year) {
-        for (Publication publication : publications) {
+        for (Publication publication : publications.values()) {
             if (publication.getClass() == Magazine.class) {
                 Magazine magazine = (Magazine) publication;
                 if (magazine.getTitle().equals(title) && magazine.getDay() == day &&

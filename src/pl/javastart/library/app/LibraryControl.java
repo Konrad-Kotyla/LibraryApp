@@ -1,20 +1,15 @@
 package pl.javastart.library.app;
 
-import pl.javastart.library.exception.DataExportException;
-import pl.javastart.library.exception.DataImportException;
-import pl.javastart.library.exception.InvalidDataException;
-import pl.javastart.library.exception.NoSuchOptionException;
+import pl.javastart.library.exception.*;
 import pl.javastart.library.file.FileManager;
 import pl.javastart.library.file.FileManagerBuilder;
 import pl.javastart.library.io.ConsolePrinter;
 import pl.javastart.library.io.DataReader;
 import pl.javastart.library.model.Book;
 import pl.javastart.library.model.Library;
+import pl.javastart.library.model.LibraryUser;
 import pl.javastart.library.model.Magazine;
-import pl.javastart.library.model.Publication;
-import pl.javastart.library.model.comparator.AlphabeticalTitleComparator;
 
-import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 
@@ -44,27 +39,16 @@ class LibraryControl {
             option = getOption();
 
             switch (option) {
-                case EXIT:
-                    exit();
-                    break;
-                case ADD_BOOK:
-                    addBook();
-                    break;
-                case ADD_MAGAZINES:
-                    addMagazines();
-                    break;
-                case PRINT_BOOKS:
-                    printBooks();
-                    break;
-                case PRINT_MAGAZINES:
-                    printMagazines();
-                    break;
-                case DELETE_BOOK:
-                    deleteBook();
-                    break;
-                case DELETE_MAGAZINE:
-                    deleteMagazine();
-                    break;
+                case ADD_BOOK -> addBook();
+                case ADD_MAGAZINE -> addMagazine();
+                case PRINT_BOOKS -> printBooks();
+                case PRINT_MAGAZINES -> printMagazines();
+                case DELETE_BOOK -> deleteBook();
+                case DELETE_MAGAZINE -> deleteMagazine();
+                case ADD_USER -> addUser();
+                case PRINT_USERS -> printUsers();
+                case EXIT -> exit();
+                default -> printer.printLine("Nie ma takiej opcji, wprowadź ponownie: ");
             }
         } while (option != Option.EXIT);
     }
@@ -100,62 +84,6 @@ class LibraryControl {
         }
     }
 
-    private void printOptions() {
-        printer.printLine("Wybierz jedną z opcji: ");
-        for (Option option : Option.values()) {
-            printer.printLine(option.toString());
-        }
-    }
-
-    private void exit() {
-        try {
-            fileManager.exportData(library);
-            printer.printLine("Export danych do pliku zakończony powoedzniem.");
-        } catch (DataExportException e) {
-            printer.printLine(e.getMessage());
-        }
-        printer.printLine("Do widzenia!");
-        dataReader.close();
-    }
-
-    private void addBook() {
-        try {
-            Book book = dataReader.readAndCreateBook();
-            library.addPublication(book);
-        } catch (InputMismatchException ex) {
-            printer.printLine("Nie udało się utworzyć książki, niepoprawne dane");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            printer.printLine(e.getMessage());
-        }
-    }
-
-    private void printBooks() {
-        Publication[] publications = getSortedPublications();
-        printer.printBooks(publications);
-    }
-
-    private void addMagazines() {
-        try {
-            Magazine magazine = dataReader.readAndCreateMagazine();
-            library.addPublication(magazine);
-        } catch (InputMismatchException ex) {
-            printer.printLine("Nie udało się utworzyć książki, niepoprawne dane");
-        } catch (ArrayIndexOutOfBoundsException e) {
-            printer.printLine(e.getMessage());
-        }
-    }
-
-    private void printMagazines() {
-        Publication[] publications = getSortedPublications();
-        printer.printMagazines(publications);
-    }
-
-    private Publication[] getSortedPublications() {
-        Publication[] publications = library.getPublications();
-        Arrays.sort(publications, new AlphabeticalTitleComparator());
-        return publications;
-    }
-
     private Option getOption() {
         boolean optionOk = false;
         Option option = null;
@@ -173,14 +101,77 @@ class LibraryControl {
         return option;
     }
 
+    private void printOptions() {
+        printer.printLine("Wybierz jedną z opcji: ");
+        for (Option option : Option.values()) {
+            printer.printLine(option.toString());
+        }
+    }
+
+    private void addBook() {
+        try {
+            Book book = dataReader.readAndCreateBook();
+            library.addPublication(book);
+        } catch (InputMismatchException ex) {
+            printer.printLine("Nie udało się utworzyć książki, niepoprawne dane");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            printer.printLine(e.getMessage());
+        }
+    }
+
+    private void addMagazine() {
+        try {
+            Magazine magazine = dataReader.readAndCreateMagazine();
+            library.addPublication(magazine);
+        } catch (InputMismatchException ex) {
+            printer.printLine("Nie udało się utworzyć książki, niepoprawne dane");
+        } catch (ArrayIndexOutOfBoundsException e) {
+            printer.printLine(e.getMessage());
+        }
+    }
+
+    private void addUser() {
+        LibraryUser libraryUser = dataReader.createLibraryUser();
+        try {
+            library.addUser(libraryUser);
+        } catch (UserAlreadyExistsException e) {
+            printer.printLine(e.getMessage());
+        }
+    }
+
+    private void printBooks() {
+        printer.printBooks(library.getPublications().values());
+    }
+
+    private void printMagazines() {
+        printer.printMagazines(library.getPublications().values());
+    }
+
+    private void printUsers() {
+        printer.printUsers(library.getUsers().values());
+    }
+
+    private void exit() {
+        try {
+            fileManager.exportData(library);
+            printer.printLine("Export danych do pliku zakończony powoedzniem.");
+        } catch (DataExportException e) {
+            printer.printLine(e.getMessage());
+        }
+        printer.printLine("Do widzenia!");
+        dataReader.close();
+    }
+
     private enum Option {
-        EXIT(0, "wyjście z programu"),
+        EXIT(0, "Wyjście z programu"),
         ADD_BOOK(1, "Dodaj książkę"),
-        ADD_MAGAZINES(2, "Dodaj magazyn"),
+        ADD_MAGAZINE(2, "Dodaj magazyn"),
         PRINT_BOOKS(3, "Wyświetl dostępne książki"),
         PRINT_MAGAZINES(4, "Wyświetl dostępne magazyny"),
         DELETE_BOOK(5, "Usuń książkę"),
-        DELETE_MAGAZINE(6, "Usuń magazyn");
+        DELETE_MAGAZINE(6, "Usuń magazyn"),
+        ADD_USER(7, "Dodaj czytelnika"),
+        PRINT_USERS(8, "Wyświetl czytelników");
 
         private final int value;
         private final String description;
