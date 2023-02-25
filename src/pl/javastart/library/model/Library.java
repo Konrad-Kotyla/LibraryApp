@@ -4,9 +4,7 @@ import pl.javastart.library.exception.PublicationAlreadyExistsException;
 import pl.javastart.library.exception.UserAlreadyExistsException;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class Library implements Serializable {
     private Map<String, Publication> publications = new HashMap<>();
@@ -63,6 +61,18 @@ public class Library implements Serializable {
             }
         }
         throw new NoSuchElementException("Nie znaleziono takiego magazynu!");
+    }
+
+    public Collection<Publication> getSortedPublications(Comparator<Publication> comparator) {
+        List<Publication> publications = new ArrayList<>(this.publications.values());
+        publications.sort(comparator);
+        return publications;
+    }
+
+    public Collection<LibraryUser> getSortedUsers(Comparator<LibraryUser> comparator) {
+        List<LibraryUser> users = new ArrayList<>(this.users.values());
+        users.sort(comparator);
+        return users;
     }
 }
 

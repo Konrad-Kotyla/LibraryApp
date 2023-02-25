@@ -5,11 +5,9 @@ import pl.javastart.library.file.FileManager;
 import pl.javastart.library.file.FileManagerBuilder;
 import pl.javastart.library.io.ConsolePrinter;
 import pl.javastart.library.io.DataReader;
-import pl.javastart.library.model.Book;
-import pl.javastart.library.model.Library;
-import pl.javastart.library.model.LibraryUser;
-import pl.javastart.library.model.Magazine;
+import pl.javastart.library.model.*;
 
+import java.util.Comparator;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 
@@ -140,15 +138,15 @@ class LibraryControl {
     }
 
     private void printBooks() {
-        printer.printBooks(library.getPublications().values());
+        printer.printBooks(library.getSortedPublications(Comparator.comparing(Publication::getTitle, String.CASE_INSENSITIVE_ORDER)));
     }
 
     private void printMagazines() {
-        printer.printMagazines(library.getPublications().values());
+        printer.printMagazines(library.getSortedPublications(Comparator.comparing(Publication::getTitle, String.CASE_INSENSITIVE_ORDER)));
     }
 
     private void printUsers() {
-        printer.printUsers(library.getUsers().values());
+        printer.printUsers(library.getSortedUsers(Comparator.comparing(LibraryUser::getLastName, String.CASE_INSENSITIVE_ORDER)));
     }
 
     private void exit() {
