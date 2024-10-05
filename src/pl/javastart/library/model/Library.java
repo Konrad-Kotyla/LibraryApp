@@ -10,11 +10,27 @@ public class Library implements Serializable {
     private Map<String, Publication> publications = new HashMap<>();
     private Map<String, LibraryUser> users = new HashMap<>();
 
+    public Optional<Publication> findPublicationByTitle(String title) {
+        return Optional.ofNullable(publications.get(title));
+    }
+
     public Map<String, Publication> getPublications() {
         return publications;
     }
 
+    public Collection<Publication> getSortedPublications(Comparator<Publication> comparator) {
+        List<Publication> publications = new ArrayList<>(this.publications.values());
+        publications.sort(comparator);
+        return publications;
+    }
+
     public Map<String, LibraryUser> getUsers() {
+        return users;
+    }
+
+    public Collection<LibraryUser> getSortedUsers(Comparator<LibraryUser> comparator) {
+        List<LibraryUser> users = new ArrayList<>(this.users.values());
+        users.sort(comparator);
         return users;
     }
 
@@ -36,43 +52,6 @@ public class Library implements Serializable {
 
     public boolean removePublication(Publication publication) {
         return publications.remove(publication.getTitle(), publication);
-    }
-
-    public Book findBookByIsbn(String isbn) {
-        for (Publication publication : publications.values()) {
-            if (publication.getClass() == Book.class) {
-                Book book = (Book) publication;
-                if (book.getIsbn().equals(isbn)) {
-                    return book;
-                }
-            }
-        }
-        throw new NoSuchElementException("Nie znaleziono takiej książki!");
-    }
-
-    public Magazine findMagazineByTitleAndPublicationDate(String title, int day, int month, int year) {
-        for (Publication publication : publications.values()) {
-            if (publication.getClass() == Magazine.class) {
-                Magazine magazine = (Magazine) publication;
-                if (magazine.getTitle().equals(title) && magazine.getDay() == day &&
-                        magazine.getMonth() == month && magazine.getYear() == year) {
-                    return magazine;
-                }
-            }
-        }
-        throw new NoSuchElementException("Nie znaleziono takiego magazynu!");
-    }
-
-    public Collection<Publication> getSortedPublications(Comparator<Publication> comparator) {
-        List<Publication> publications = new ArrayList<>(this.publications.values());
-        publications.sort(comparator);
-        return publications;
-    }
-
-    public Collection<LibraryUser> getSortedUsers(Comparator<LibraryUser> comparator) {
-        List<LibraryUser> users = new ArrayList<>(this.users.values());
-        users.sort(comparator);
-        return users;
     }
 }
 
